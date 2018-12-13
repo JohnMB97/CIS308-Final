@@ -9,21 +9,21 @@ typedef struct Card{
 }Card;
 
 typedef struct Hand{
-	//struct Card hand[5];
-	char hand[5][200];
+	struct Card cards[5];
+	
 }Hand;
 
 typedef struct player{
 	int score;
 	char name[10];
 	int choice;
-	char hand[5][200];
-	//struct Hand hand;
+	//char hand[5][200];
+	struct Hand hand;
 }player;
 
 typedef struct GameDB{
-	char Answers[1048];
-	char Questions[275];
+	struct Card Answers[1048];
+	struct Card Questions[275];
 	int AnswersUsed[50];
 	int QuestionsUsed[50];
 	int round; 
