@@ -2,14 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "Player.h"
+#include "types.h"
 
 char answers[1048][200];
 char questions[275][500];
 
+
 char p1Deck[5][200];
 char p2Deck[5][200];
 void createAnswers(){
+  //char answers[1048][200];
+
+  //GameDB tcards; 
   FILE *file = fopen("answers.txt" ,"r");
   char buff[200];
   int i = 0;
@@ -33,54 +37,103 @@ void createQuestions(){
   
 }
 
+void removeCard(int index){
+
+      //for (int c = index - 1; c < n - 1; c++)
+        // answers[c] = answers[c+1];
+}
+
+void printHand(player playerHand){
+    for(int count = 1; count <=5; count++){
+      printf("%d.  %s", count, playerHand.hand[count-1]);
+    }
+}
+
+boolean questionDupeCheck(int number, GameDB db){
+  for(int count = 0; count < db.round; count++){
+    if(db.AnswersUsed[count] == number){
+      return 0;
+    }
+  }
+  return 1;
+}
 
 void threePlayer(char * first, char * second){
 
+  GameDB data;
+  data.round = 0;
   player playerOne, playerTwo;
+  playerOne.score = 0;
+  playerTwo.score = 0; 
   //playerOne.name = name1;
   strcpy(playerOne.name, first);
   strcpy(playerTwo.name, second);
 
-
   srand(time(NULL));
-  while(playerOne.score < 5 && playerTwo.score < 5){
-  int randomQuestion = rand() % 275;
-  int player1Choice, player2Choice, judgeChoice;
-  
   for(int count = 0; count < 5; count++){
     int rand1 = rand() % 1048;
     int rand2 = rand() % 1048;
-
-    strcpy(p1Deck[count], answers[rand1]);
-    strcpy(p2Deck[count], answers[rand2]);
+    data.AnswersUsed[count] = rand1;
+    data.AnswersUsed[count + 1] = rand2;
+    strcpy(playerOne.hand[count], answers[rand1]);
+    strcpy(playerTwo.hand[count], answers[rand2]);
   }
-
-  printf("\n%s pick your card\n", second);
-  printf("%s", questions[randomQuestion]);
-  for(int count = 0; count < 5; count++){
-    printf("%d. %s", count, p1Deck[count]);
-  }
-  scanf("%d", &player1Choice);
-
-  printf("\n%s pick your card\n", second);
-  printf("%s", questions[randomQuestion]);
-  for(int count = 0; count < 5; count++){
-    printf("%d. %s", count, p2Deck[count]);
-  }
-  scanf("%d", &player2Choice);
-
-  printf("\n%s", questions[randomQuestion]);
-  printf("1. %s", p1Deck[player1Choice]);
-  printf("2. %s", p2Deck[player2Choice]);
-
-  scanf("%d", &judgeChoice);
-
-  if(judgeChoice == 1)
-    playerOne.score += 1;
-  else if(judgeChoice == 2)
-    playerTwo.score += 1;
-
   system("clear");
+
+  while(playerOne.score < 5 && playerTwo.score < 5){
+      data.round++;
+      int randomQuestion = rand() % 275;
+      int player1Choice, player2Choice, judgeChoice;
+
+
+      printf("\n%s pick your card\n", first);
+      printf("%s", questions[randomQuestion]);
+      printHand(playerOne);
+      scanf("%d", &player1Choice);
+      system("clear");
+
+      printf("\n%s pick your card\n", second);
+      printf("%s", questions[randomQuestion]);
+      printHand(playerTwo);
+      scanf("%d", &player2Choice);
+      system("clear");
+
+
+      printf("\n%s", questions[randomQuestion]);
+      printf("1. %s", playerOne.hand[player1Choice - 1]);
+      printf("2. %s", playerTwo.hand[player2Choice - 1]);
+
+      scanf("%d", &judgeChoice);
+
+      if(judgeChoice == 1)
+        playerOne.score += 1;
+      else if(judgeChoice == 2)
+        playerTwo.score += 1;
+
+      boolean again;
+      int new1, new2;
+
+        do{
+        new1 = rand() % 1048;
+        new2 = rand() % 1048;
+        again = False;
+
+        if(questionDupeCheck(new1, data) == 0){
+          new1 = rand() % 1048;
+          again = True;
+        }
+        else if(questionDupeCheck(new2, data) == 0){
+            new2 = rand() % 1048;
+            again = True;
+        }
+
+      }while(again == True);
+
+      
+      strcpy(playerOne.hand[player1Choice- 1], answers[new1]);
+      strcpy(playerTwo.hand[player2Choice-1], answers[new2]);
+
+      system("clear");
   
 }
 
@@ -105,7 +158,9 @@ int main(){
     char name1[10];
     char name2[10];
 
-
+    //GameData cards = createAnswers();
+    //strcpy(cards.Answers, createAnswers());
+    
 
 
     printf("Player 1 enter your name:  ");
